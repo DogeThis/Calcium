@@ -5,4 +5,6 @@
 5. Click "crawl prefab"
 
 Expectation:
-the "edit" mesh will now have cloned `PivotBones`
+the "edit" mesh will now have cloned `SpringBones`
+
+TODO: Clone all other related SpringBone components
