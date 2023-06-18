@@ -19,6 +19,11 @@ public class LoadFromFileExampleEditor: Editor
         {
             Debug.Log("hey there");
         }
+
+        if (GUILayout.Button("Crawl Prefab"))
+        {
+            CrawlBundlePrefab.Crawl(myTarget.loadedPrefab, myTarget.editedMesh);
+        }
     }
 }
 #endif
