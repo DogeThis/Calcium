@@ -1,8 +1,8 @@
 
+using System;
 using System.Linq;
 using UnityEngine;
 using UTJ;
-using UTJ.GameObjectExtensions;
 
 public class CrawlBundlePrefab
 {
@@ -26,22 +26,57 @@ public class CrawlBundlePrefab
             else
             {
                 Debug.Log("Found long list sibling " + springBone.name + " in meshEditorGameObject");
-                DeepCopySpringBone(springBone, meshEditorObject);
+                DeepCopySpringBone(springBone, meshEditorObject, meshEditorGameObject);
             }
         }
     }
 
     // Returns a deep copy of the spring bone.
-    static void DeepCopySpringBone(SpringBone original, GameObject target)
+    static void DeepCopySpringBone(SpringBone original, GameObject target, GameObject targetRoot)
     {
-        var newSpringBone = target.AddComponent<SpringBone>();
-        newSpringBone.radius = original.radius;
-        newSpringBone.angularStiffness = original.angularStiffness;
-        newSpringBone.capsuleColliders = original.capsuleColliders; // TODO deep copy the spring colliders
-        newSpringBone.dragForce = original.dragForce;
-        newSpringBone.jobColliders = original.jobColliders; // TODO deep copy these
+        // New spring bone
+        var nsb = target.AddComponent<SpringBone>();
+        // use reflection and check if enabledJobSystem is True on the original SpringBone
+        var originalEnabledJobField = original.GetType().GetField("enabledJobSystem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var enabledJobSystem = (bool)originalEnabledJobField.GetValue(original);
+        // if it is, then set enabledJobSystem to be True on the new SpringBone
+        // use reflection and set enabledJobSystem to be equal to that of the original SpringBone
+        var nsbEnabledJobField = nsb.GetType().GetField("enabledJobSystem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        nsbEnabledJobField.SetValue(nsb, enabledJobSystem);
+        nsb.jobColliders = original.jobColliders; // TODO deep copy these?
+        nsb.validChildren = Array.Empty<Transform>();
+        foreach (var validChild in original.validChildren)
+        {
+            // Get the name of the valid child
+            var validChildName = validChild.name;
+            // Find the object in meshEditorGameObject hierarchy has the same name as the validChild
+            // (Could be one of the deep children)
+            var meshEditorObject = target.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(c => c.gameObject.name == validChildName)?.gameObject;
+            Debug.Log(meshEditorObject);
+            // Push to the nsb's validChildren
+            nsb.validChildren = nsb.validChildren.Append(meshEditorObject.transform).ToArray();
+        }
+        nsb.stiffnessForce = original.stiffnessForce;
+        nsb.dragForce = original.dragForce;
+        nsb.springForce = original.springForce;
+        nsb.windInfluence = original.windInfluence;
+        //pivot node
+        // Get the name of the pivot node
+        var pivotNodeName = original.pivotNode.name;
+        // Find the object in targetRoot hierarchy has the same name as the pivotNode
+        // (Most likely a sibling. But I am not sure. Start at root.)
+        var pivotNodeObject = targetRoot.GetComponentsInChildren<Transform>()
+            .FirstOrDefault(c => c.gameObject.name == pivotNodeName)?.gameObject;
+        Debug.Log(pivotNodeObject);
+        nsb.pivotNode = pivotNodeObject.transform;
+        nsb.angularStiffness = original.angularStiffness;
+        nsb.yAngleLimits = original.yAngleLimits;
+        nsb.zAngleLimits = original.zAngleLimits; 
+        // nsb.lengthLimitTargets
+        nsb.radius = original.radius;
+        // TBD all the colliders (are they ever used?)
     }
-
 }
 
 

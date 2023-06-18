@@ -10,16 +10,11 @@ public class LoadFromFileExampleEditor: Editor
         DrawDefaultInspector();
         
         LoadFromFileExample myTarget = (LoadFromFileExample)target;
-        if (GUILayout.Button("Load AssetBundle"))
+        if (GUILayout.Button("Load prefab from AssetBundle"))
         {
             myTarget.LoadAssetBundle();
         }
-
-        if (GUILayout.Button("Debug"))
-        {
-            Debug.Log("hey there");
-        }
-
+        
         if (GUILayout.Button("Crawl Prefab"))
         {
             CrawlBundlePrefab.Crawl(myTarget.loadedPrefab, myTarget.editedMesh);
