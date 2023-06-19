@@ -3,12 +3,18 @@ using UnityEngine;
 
 public class LoadFromFileExample : MonoBehaviour
 {
+    public string pathToAssetBundle = "ubody_dnc0am_c403.bundle";
     public GameObject loadedPrefab;
 
     public GameObject editedMesh;
     public void LoadAssetBundle()
     {
-        var myLoadedAssetBundle = AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, "ubody_dnc0am_c403.bundle"));
+        if (pathToAssetBundle == null) 
+        {
+            Debug.Log("no path to asset bundle");
+            return;
+        }
+        var myLoadedAssetBundle = AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, pathToAssetBundle));
 
         if (myLoadedAssetBundle == null)
         {
