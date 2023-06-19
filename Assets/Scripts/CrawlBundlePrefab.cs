@@ -11,6 +11,34 @@ public class CrawlBundlePrefab
     {
         HandleSpringJobManagers(prefabGameObject, meshEditorGameObject);
         HandleSpringBones(prefabGameObject, meshEditorGameObject);
+        HandleSpringBonePivots(prefabGameObject, meshEditorGameObject);
+    }
+
+    static void HandleSpringBonePivots(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    {
+        Debug.Log("Entering HandleSpringBonePivots");
+        // Find the objects in the tree that have the SpringBonePivot component on them
+        var springBonePivots = prefabGameObject.GetComponentsInChildren<SpringBonePivot>();
+        Debug.Log(springBonePivots.Length);
+        foreach (var springBonePivot in springBonePivots)
+        {
+            // Find the object in meshEditorGameObject hierarchy has the same name as the springBonePivot
+            // (Could be one of the deep children)
+            var meshEditorObject = meshEditorGameObject.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(c => c.gameObject.name == springBonePivot.name)?.gameObject;
+            
+            // continue if we didn't find a matching object
+            if (meshEditorObject == null)
+            {
+                Debug.Log("Couldn't find matching object for springBonePivot: " + springBonePivot.name);
+                continue;
+            }
+            // Instantiate a new SpringBonePivot on the meshEditorObject
+            Debug.Log("Found long list sibling " + springBonePivot.name + " in meshEditorGameObject");
+            meshEditorObject.AddComponent<SpringBonePivot>();
+        }
+        
+        Debug.Log("Exiting HandleSpringBonePivots");
     }
 
     static void HandleSpringJobManagers(GameObject prefabGameObject, GameObject meshEditorGameObject)
@@ -59,7 +87,6 @@ public class CrawlBundlePrefab
             if (meshEditorObject == null)
             {
                 Debug.Log("Could not find " + springBone.name + " in meshEditorGameObject");
-                continue;
             }
             else
             {
@@ -141,6 +168,7 @@ public class CrawlBundlePrefab
         nsjm.resetDistance = original.resetDistance;
         nsjm.resetAngle = original.resetAngle;
     }
+    
 }
 
 
