@@ -3,14 +3,52 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UTJ;
+using UTJ.Jobs;
 
 public class CrawlBundlePrefab
 {
     public static void Crawl(GameObject prefabGameObject, GameObject meshEditorGameObject)
     {
+        HandleSpringJobManagers(prefabGameObject, meshEditorGameObject);
+        HandleSpringBones(prefabGameObject, meshEditorGameObject);
+    }
+
+    static void HandleSpringJobManagers(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    {
+        Debug.Log("Entering HandleSpringJobManagers");
+        // Find the objects in the tree that have the SpringJobManager component on them
+        var springJobManagers = prefabGameObject.GetComponentsInChildren<SpringJobManager>();
+        Debug.Log(springJobManagers.Length);
+
+        foreach (var springJobManager in springJobManagers)
+        {
+            // Find the object in meshEditorGameObject hierarchy has the same name as the springJobManager
+            // (Could be one of the deep children)
+            var meshEditorObject = meshEditorGameObject.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(c => c.gameObject.name == springJobManager.name)?.gameObject;
+            Debug.Log(meshEditorObject);
+            if (meshEditorObject == null)
+            {
+                Debug.Log("Could not find " + springJobManager.name + " in meshEditorGameObject");
+            }
+            else
+            {
+                Debug.Log("Found long list sibling " + springJobManager.name);
+                DeepCopySpringJobManager(springJobManager, meshEditorObject);
+            }
+            
+        }
+        
+        Debug.Log("Exiting HandleSpringJobManagers");
+    }
+
+
+    static void HandleSpringBones(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    {
         // Find the objects in the tree that have the SpringBone component on them
         var springBones = prefabGameObject.GetComponentsInChildren<SpringBone>();
         Debug.Log(springBones.Length);
+        
         foreach (var springBone in springBones)
         {
             Debug.Log(springBone.name);
@@ -30,7 +68,6 @@ public class CrawlBundlePrefab
             }
         }
     }
-
     // Returns a deep copy of the spring bone.
     static void DeepCopySpringBone(SpringBone original, GameObject target, GameObject targetRoot)
     {
@@ -76,6 +113,33 @@ public class CrawlBundlePrefab
         // nsb.lengthLimitTargets
         nsb.radius = original.radius;
         // TBD all the colliders (are they ever used?)
+    }
+
+    static void DeepCopySpringJobManager(SpringJobManager original, GameObject target)
+    {
+        // New spring job manager
+        var nsjm = target.AddComponent<SpringJobManager>();
+        nsjm.optimizeTransform = original.optimizeTransform;
+        nsjm.isPaused = original.isPaused;
+        nsjm.simulationFrameRate = original.simulationFrameRate;
+        nsjm.dynamicRatio = original.dynamicRatio;
+        nsjm.gravity = original.gravity;
+        nsjm.bounce = original.bounce;
+        nsjm.friction = original.friction;
+        nsjm.time = original.time;
+        nsjm.enableAngleLimits = original.enableAngleLimits;
+        nsjm.enableCollision = original.enableCollision;
+        nsjm.enableLengthLimits = original.enableLengthLimits;
+        nsjm.collideWithGround = original.collideWithGround;
+        nsjm.groundHeight = original.groundHeight;
+        nsjm.windDisabled = original.windDisabled;
+        nsjm.windInfluence = original.windInfluence;
+        nsjm.windPower = original.windPower;
+        nsjm.windDir = original.windDir;
+        nsjm.distanceRate = original.distanceRate;
+        nsjm.automaticReset = original.automaticReset;
+        nsjm.resetDistance = original.resetDistance;
+        nsjm.resetAngle = original.resetAngle;
     }
 }
 
