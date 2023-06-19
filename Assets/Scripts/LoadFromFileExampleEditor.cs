@@ -15,9 +15,13 @@ public class LoadFromFileExampleEditor: Editor
             myTarget.LoadAssetBundle();
         }
         
-        if (GUILayout.Button("Crawl Prefab"))
+        if (GUILayout.Button("Crawl Prefab and transfer Spring Bone Information"))
         {
             CrawlBundlePrefab.Crawl(myTarget.loadedPrefab, myTarget.editedMesh);
+        }
+        if (GUILayout.Button("Unload All (Do this before saving)"))
+        {
+            myTarget.UnloadAssetBundles();
         }
     }
 }
