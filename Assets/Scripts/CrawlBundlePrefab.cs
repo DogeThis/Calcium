@@ -7,62 +7,63 @@ using UTJ.Jobs;
 
 public class CrawlBundlePrefab
 {
-    public static void Crawl(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    // Crawl over the prefab and transfer spring bone information to the mesh edit game object 
+    public static void Crawl(GameObject prefabGameObject, GameObject meshEditGameObject)
     {
-        HandleSpringJobManagers(prefabGameObject, meshEditorGameObject);
-        HandleSpringBones(prefabGameObject, meshEditorGameObject);
-        HandleSpringBonePivots(prefabGameObject, meshEditorGameObject);
+        HandleSpringJobManagers(prefabGameObject, meshEditGameObject);
+        HandleSpringBones(prefabGameObject, meshEditGameObject);
+        HandleSpringBonePivots(prefabGameObject, meshEditGameObject);
     }
 
-    static void HandleSpringBonePivots(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    static void HandleSpringBonePivots(GameObject prefabGameObject, GameObject meshEditGameObject)
     {
         Debug.Log("Entering HandleSpringBonePivots");
         // Find the objects in the tree that have the SpringBonePivot component on them
         var springBonePivots = prefabGameObject.GetComponentsInChildren<SpringBonePivot>();
-        Debug.Log(springBonePivots.Length);
+        Debug.Log("Found " + springBonePivots.Length + " spring bone pivots");
         foreach (var springBonePivot in springBonePivots)
         {
-            // Find the object in meshEditorGameObject hierarchy has the same name as the springBonePivot
+            // Find the object in meshEditGameObject hierarchy has the same name as the springBonePivot
             // (Could be one of the deep children)
-            var meshEditorObject = meshEditorGameObject.GetComponentsInChildren<Transform>()
+            var meshEditObject = meshEditGameObject.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(c => c.gameObject.name == springBonePivot.name)?.gameObject;
             
             // continue if we didn't find a matching object
-            if (meshEditorObject == null)
+            if (meshEditObject == null)
             {
                 Debug.Log("Couldn't find matching object for springBonePivot: " + springBonePivot.name);
                 continue;
             }
-            // Instantiate a new SpringBonePivot on the meshEditorObject
-            Debug.Log("Found long list sibling " + springBonePivot.name + " in meshEditorGameObject");
-            meshEditorObject.AddComponent<SpringBonePivot>();
+            // Instantiate a new SpringBonePivot on the meshEditObject
+            Debug.Log("Found long list sibling " + springBonePivot.name + " in meshEditGameObject");
+            meshEditObject.AddComponent<SpringBonePivot>();
         }
         
         Debug.Log("Exiting HandleSpringBonePivots");
     }
 
-    static void HandleSpringJobManagers(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    static void HandleSpringJobManagers(GameObject prefabGameObject, GameObject meshEditGameObject)
     {
         Debug.Log("Entering HandleSpringJobManagers");
         // Find the objects in the tree that have the SpringJobManager component on them
         var springJobManagers = prefabGameObject.GetComponentsInChildren<SpringJobManager>();
-        Debug.Log(springJobManagers.Length);
+        Debug.Log("Found " + springJobManagers.Length + " spring job managers");
 
         foreach (var springJobManager in springJobManagers)
         {
-            // Find the object in meshEditorGameObject hierarchy has the same name as the springJobManager
+            // Find the object in meshEditGameObject hierarchy has the same name as the springJobManager
             // (Could be one of the deep children)
-            var meshEditorObject = meshEditorGameObject.GetComponentsInChildren<Transform>()
+            var meshEditObject = meshEditGameObject.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(c => c.gameObject.name == springJobManager.name)?.gameObject;
-            Debug.Log(meshEditorObject);
-            if (meshEditorObject == null)
+            Debug.Log(meshEditObject);
+            if (meshEditObject == null)
             {
-                Debug.Log("Could not find " + springJobManager.name + " in meshEditorGameObject");
+                Debug.Log("Could not find " + springJobManager.name + " in meshEditGameObject");
             }
             else
             {
                 Debug.Log("Found long list sibling " + springJobManager.name);
-                DeepCopySpringJobManager(springJobManager, meshEditorObject);
+                DeepCopySpringJobManager(springJobManager, meshEditObject);
             }
             
         }
@@ -71,27 +72,27 @@ public class CrawlBundlePrefab
     }
 
 
-    static void HandleSpringBones(GameObject prefabGameObject, GameObject meshEditorGameObject)
+    static void HandleSpringBones(GameObject prefabGameObject, GameObject meshEditGameObject)
     {
         // Find the objects in the tree that have the SpringBone component on them
         var springBones = prefabGameObject.GetComponentsInChildren<SpringBone>();
-        Debug.Log(springBones.Length);
+        Debug.Log("Number of spring bones in prefab: " + springBones.Length);
         
         foreach (var springBone in springBones)
         {
-            Debug.Log(springBone.name);
-            // Find the object in meshEditorGameObject hierarchy has the same name as the springBone
+            Debug.Log("Examine spring bone: " + springBone.name);
+            // Find the object in meshEditGameObject hierarchy has the same name as the springBone
             // (Could be one of the deep children)
-            var meshEditorObject = meshEditorGameObject.GetComponentsInChildren<Transform>()
+            var meshEditObject = meshEditGameObject.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(c => c.gameObject.name == springBone.name)?.gameObject;
-            if (meshEditorObject == null)
+            if (meshEditObject == null)
             {
-                Debug.Log("Could not find " + springBone.name + " in meshEditorGameObject");
+                Debug.Log("Could not find " + springBone.name + " in meshEditGameObject");
             }
             else
             {
-                Debug.Log("Found long list sibling " + springBone.name + " in meshEditorGameObject");
-                DeepCopySpringBone(springBone, meshEditorObject, meshEditorGameObject);
+                Debug.Log("Found long list sibling " + springBone.name + " in meshEditGameObject");
+                DeepCopySpringBone(springBone, meshEditObject, meshEditGameObject);
             }
         }
     }
@@ -113,13 +114,19 @@ public class CrawlBundlePrefab
         {
             // Get the name of the valid child
             var validChildName = validChild.name;
-            // Find the object in meshEditorGameObject hierarchy has the same name as the validChild
+            // Find the object in meshEditGameObject hierarchy has the same name as the validChild
             // (Could be one of the deep children)
-            var meshEditorObject = target.GetComponentsInChildren<Transform>()
+            var meshEditObject = target.GetComponentsInChildren<Transform>()
                 .FirstOrDefault(c => c.gameObject.name == validChildName)?.gameObject;
-            Debug.Log(meshEditorObject);
+            Debug.Log(meshEditObject);
+            if (!meshEditObject)
+            {
+                // Was unable to find a matching object. Skip it.
+                Debug.Log("Wasn't able to find a match for " + validChildName);
+                continue;
+            }
             // Push to the nsb's validChildren
-            nsb.validChildren = nsb.validChildren.Append(meshEditorObject.transform).ToArray();
+            nsb.validChildren = nsb.validChildren.Append(meshEditObject.transform).ToArray();
         }
         nsb.stiffnessForce = original.stiffnessForce;
         nsb.dragForce = original.dragForce;
@@ -133,7 +140,13 @@ public class CrawlBundlePrefab
         var pivotNodeObject = targetRoot.GetComponentsInChildren<Transform>()
             .FirstOrDefault(c => c.gameObject.name == pivotNodeName)?.gameObject;
         Debug.Log(pivotNodeObject);
-        nsb.pivotNode = pivotNodeObject.transform;
+        if (pivotNodeObject != null)
+        {
+            nsb.pivotNode = pivotNodeObject.transform;
+        } else
+        {
+            Debug.Log("Wasn't able to find a match for " + pivotNodeName + " pivot");
+        }
         nsb.angularStiffness = original.angularStiffness;
         nsb.yAngleLimits = original.yAngleLimits;
         nsb.zAngleLimits = original.zAngleLimits; 
