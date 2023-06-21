@@ -1,8 +1,10 @@
 1. Open the scene called Scene.
-2. Drag in the "edit" mesh into the scene.
-3. Drag the resulting gameobject into `BoneCopier`'s  "edited mesh"
-4. Click "load prefab from assetbundle"
-5. Click "crawl prefab"
+2. Bring the asset bundle you want to import into StreamingAssets
+3. Set the bundle name in `BoneCopier`
+4. Drag in the "edit" mesh into the scene.
+5. Drag the resulting gameobject into `BoneCopier`'s  "edited mesh"
+6. Click "load prefab from assetbundle"
+7. Click "crawl prefab"
 
 Expectation:
 the "edit" mesh will now have cloned `SpringBones`
