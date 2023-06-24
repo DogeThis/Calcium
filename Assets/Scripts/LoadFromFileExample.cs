@@ -6,19 +6,22 @@ public class LoadFromFileExample : MonoBehaviour
 {
     // label as "Name of bundle" in the editor
     
-    [Tooltip("The name of the bundle you want to load for spring bone information. No .bundle extension, we'll add it for you.")]
+    [Tooltip("The name of the bundle you want to load for spring bone information. No .bundle extension, we'll add it for you)")]
     [FormerlySerializedAs("pathToAssetBundle")] public string nameOfBundleToLoad = "ubody_dnc0am_c403";
     
+    [Tooltip("Keeping around for debugging purposes.")]
     public GameObject loadedPrefab;
 
+    [Tooltip("The mesh you want to transfer spring bone information to.")]
     public GameObject editedMesh;
 
-    public  GameObject createdObject;
+    [Tooltip("Keeping around for debugging purposes.")]
+    public GameObject createdObject;
 
-    [Tooltip("The name of the bundle you want to build. (this is what you assigned yourself in Unity's editor) (no .bundle extension, we'll add it for you")]
+    [Tooltip("The name of the bundle you want to build. (this is what you assigned yourself in Unity's editor) (no .bundle extension, we'll add it for you)")]
     public string nameOfBundleToBuild;
 
-    [Tooltip("Name of the output bundle (no .bundle extension, we'll add it for you")]
+    [Tooltip("Name of the output bundle to be put into AssetBundles folder (no .bundle extension, we'll add it for you)")]
     public string outputFileName = "output_name";
     public void LoadAssetBundle()
     {

@@ -32,7 +32,7 @@ public class LoadFromFileExampleEditor: Editor
             var assetBundleName = myTarget.nameOfBundleToBuild;
             if (assetBundleName == null)
             {
-                Debug.Log("I need an asset bundle name to continue.");
+                Debug.Log("I need an bundle name to continue.");
                 return;
             }
             
