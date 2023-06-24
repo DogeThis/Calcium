@@ -23,6 +23,11 @@ public class LoadFromFileExampleEditor: Editor
         {
             myTarget.UnloadAssetBundles();
         }
+
+        if (GUILayout.Button("Build bundle"))
+        {
+            BuildPipeline.BuildAssetBundles ("Assets/AssetBundles", BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
+        }
     }
 }
 #endif
