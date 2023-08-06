@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UTJ;
@@ -10,9 +11,9 @@ public class CrawlBundlePrefab
     // Crawl over the prefab and transfer spring bone information to the mesh edit game object 
     public static void Crawl(GameObject prefabGameObject, GameObject meshEditGameObject)
     {
-        HandleSpringJobManagers(prefabGameObject, meshEditGameObject);
         HandleSpringBones(prefabGameObject, meshEditGameObject);
         HandleSpringBonePivots(prefabGameObject, meshEditGameObject);
+        HandleSpringJobManagers(prefabGameObject, meshEditGameObject);
     }
 
     static void HandleSpringBonePivots(GameObject prefabGameObject, GameObject meshEditGameObject)
@@ -180,6 +181,26 @@ public class CrawlBundlePrefab
         nsjm.automaticReset = original.automaticReset;
         nsjm.resetDistance = original.resetDistance;
         nsjm.resetAngle = original.resetAngle;
+        nsjm.SortedBones = original.SortedBones;
+        // make a new array of SpringBones
+        List<SpringBone> sortedBonesTemp = new List<SpringBone>();
+        foreach (var originalSortedBone in original.SortedBones)
+        {
+            // Get the name of the sorted bone
+            var sortedBoneName = originalSortedBone.name;
+            // Find the object in target hierarchy has the same name as the sortedBone
+            // (Start at root.)
+            var sortedBoneObjectOnTarget = target.GetComponentsInChildren<Transform>()
+                .FirstOrDefault(c => c.gameObject.name == sortedBoneName)?.gameObject;
+            sortedBonesTemp.Add(sortedBoneObjectOnTarget.GetComponent<SpringBone>());
+        }
+        nsjm.SortedBones = sortedBonesTemp.ToArray();
+
+        nsjm.jobColliders = original.jobColliders;
+        nsjm.jobProperties = original.jobProperties;
+        nsjm.initLocalRotations = original.initLocalRotations;
+        nsjm.jobColProperties = original.jobColProperties;
+        nsjm.jobLengthProperties = original.jobLengthProperties;
     }
     
 }
